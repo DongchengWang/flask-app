@@ -13,3 +13,7 @@ pip install flask-script flask-bootstrap flask-wtf
 pip install flask-sqlalchemy flask-moment flask-migrate
 pip install flask-mail
 ```
+# 科学计算和机器学习库
+```
+pip install numpy matplotlib scikit-learn pandas jupyter
+```

@@ -18,9 +18,9 @@ def index():
             db.session.add(user)
             session['known'] = False
             # 每当表单接受新名字，都回想管理员发送邮件
-            if app.config['FLASKY_ADMIN']:
-                send_mail(app.config['FLASKY_ADMIN'],
-                          'New User', 'mail/new_user', user=user)
+            if current_app.config['FLASKY_ADMIN']:
+                send_mail(current_app.config['FLASKY_ADMIN'], 'New User',
+                          'mail/new_user', user=user)
         else:
             session['known'] = True
         session['name'] = form.name.data
