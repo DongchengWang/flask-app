@@ -1,26 +1,26 @@
-# coding:utf-8
-from flask import Flask, render_template
+# -*- coding:utf-8-*-
+# !/usr/bin/env python3
+import os
 from flask import session, redirect, url_for, flash
 from flask_script import Manager, Shell
-from flask_bootstrap import Bootstrap
-from flask_moment import Moment
+
+
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required
-from flask_sqlalchemy import SQLAlchemy
-import os
+
 from flask_migrate import Migrate, MigrateCommand
-from flask_mail import Mail
+
+from flask_mail import Message
+from threading import Thread
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-
+# 初始化
 app = Flask(__name__)
 manager = Manager(app)
-bootstrap = Bootstrap(app)
-moment = Moment(app)
-mail = Mail(app)
+
 app.config['SECRET_KEY'] = 'hard to guess string'
 # 数据库配置
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
@@ -28,13 +28,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 # 邮件系统
-app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_SERVER'] = 'smtp.126.com'
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USEE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] =os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] =os.environ.get('MAIL_PASSWORD')
+# 设置默认的邮件账户前缀
+app.config['FLASKY_MAIL_SUBJEXT_PREFIX'] = '[Flasky]'
+app.config['FLASKY_MAIL_SENDER'] = 'Flasky Admin <luffy12345@126.com>'
+app.config['FLASKY_ADMIN']=os.environ.get('FLASKY_ADMIN')
 
-db = SQLAlchemy(app)
 
 
 def make_shell_context():
@@ -43,11 +46,26 @@ def make_shell_context():
 
 manager.add_command('shell', Shell(make_context=make_shell_context))
 
+# 发送邮件给用户
+def send_mail(to, subject, template, **kwargs):
+    msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + ' '+subject,sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
+    msg.body = render_template(template + '.txt', **kwargs)
+    msg.html = render_template(template + '.html', **kwargs)
+    thr=Thread(target=send_async_email,args=[app,msg])
+    thr.start()
+    return thr
+
+# 异步发送邮件
+def send_async_email(app,msg):
+    with app.app_context():
+        mail.send(msg)
 
 class NameForm(FlaskForm):
     # 文本字段，确保提交不为空
     name = StringField('What is your name?', validators=[Required()])
     submit = SubmitField('Submit')
+
+# 数据库操作
 
 
 class Role(db.Model):
@@ -59,7 +77,6 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.name
 
-
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -69,7 +86,7 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-
+# 首页
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = NameForm()
@@ -80,6 +97,9 @@ def index():
             user = User(username=form.name.data)
             db.session.add(user)
             session['known'] = False
+            # 每当表单接受新名字，都回想管理员发送邮件
+            if app.config['FLASKY_ADMIN']:
+                send_mail(app.config['FLASKY_ADMIN'],'New User','mail/new_user',user=user)
         else:
             session['known'] = True
         session['name'] = form.name.data
@@ -96,14 +116,7 @@ def user(name):
     return render_template('user.html', name=name)
 
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
 
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500
 
 
 # 数据库迁移
