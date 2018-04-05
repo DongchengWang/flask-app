@@ -5,7 +5,6 @@ import os
 from flask import session, redirect, url_for, flash
 from flask_script import Manager, Shell
 
-
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -15,7 +14,6 @@ from flask_migrate import Migrate, MigrateCommand
 
 from flask_mail import Message
 from threading import Thread
-
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 # 初始化
@@ -50,13 +48,16 @@ manager.add_command('shell', Shell(make_context=make_shell_context))
 
 
 def send_mail(to, subject, template, **kwargs):
-    msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + ' ' +
-                  subject, sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
+    msg = Message(
+        app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + ' ' + subject,
+        sender=app.config['FLASKY_MAIL_SENDER'],
+        recipients=[to])
     msg.body = render_template(template + '.txt', **kwargs)
     msg.html = render_template(template + '.html', **kwargs)
     thr = Thread(target=send_async_email, args=[app, msg])
     thr.start()
     return thr
+
 
 # 异步发送邮件
 
@@ -70,6 +71,7 @@ class NameForm(FlaskForm):
     # 文本字段，确保提交不为空
     name = StringField('What is your name?', validators=[Required()])
     submit = SubmitField('Submit')
+
 
 # 数据库操作
 
@@ -93,6 +95,7 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+
 # 首页
 
 
@@ -108,17 +111,23 @@ def index():
             session['known'] = False
             # 每当表单接受新名字，都回想管理员发送邮件
             if app.config['FLASKY_ADMIN']:
-                send_mail(app.config['FLASKY_ADMIN'],
-                          'New User', 'mail/new_user', user=user)
+                send_mail(
+                    app.config['FLASKY_ADMIN'],
+                    'New User',
+                    'mail/new_user',
+                    user=user)
         else:
             session['known'] = True
         session['name'] = form.name.data
         form.name.data = ''
         return redirect(url_for('index'))
 
-    return render_template('index.html',
-                           current_time=datetime.utcnow(),
-                           form=form, name=session.get('name'), known=session.get('known', False))
+    return render_template(
+        'index.html',
+        current_time=datetime.utcnow(),
+        form=form,
+        name=session.get('name'),
+        known=session.get('known', False))
 
 
 @app.route('/user/<name>')
@@ -126,11 +135,9 @@ def user(name):
     return render_template('user.html', name=name)
 
 
-
 # 数据库迁移
 migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
-
 
 if __name__ == '__main__':
     manager.run()
