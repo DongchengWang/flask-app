@@ -1,1 +1,4 @@
-{}
+{
+    "python.linting.pylintEnabled": false,
+    "python.pythonPath": "/home/wang/.pyenv/versions/3.7.0/bin/python"
+}
