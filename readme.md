@@ -10,6 +10,5 @@
 # 需要安装的依赖包
 
 ```
-pip install pipenv
-pipenv install
+pip install flask flask-script flask-bootstrap flask-wtf flask-sqlalchemy flask-moment flask-migrate flask-mail flask-login
 ```

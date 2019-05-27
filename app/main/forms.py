@@ -5,5 +5,7 @@ from wtforms.validators import Required
 
 class NameForm(FlaskForm):
     """文本字段，确保提交不为空"""
-    name = StringField('What is your name?', validators=[Required()])
-    submit = SubmitField('Submit')
+
+    name = StringField("What is your name?", validators=[Required()])
+    submit = SubmitField("Submit")
+

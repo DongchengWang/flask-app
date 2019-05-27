@@ -1,4 +1,11 @@
-.vscode/
-**/__pycache__/
-.mypy_cache/
-.idea/
+# env
+env
+
+# ide
+.vscode
+.idea
+
+# cache
+__pycache__
+.mypy_cache
+.pytest_cache
