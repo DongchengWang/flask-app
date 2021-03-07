@@ -1,11 +1,10 @@
-# env
-env
+# IDEs
+.vscode/
+.idea/
+.vs/
 
-# ide
-.vscode
-.idea
-
-# cache
-__pycache__
-.mypy_cache
-.pytest_cache
+# Caches
+**/__pycache__/
+**/.mypy_cache/
+**/.pytest_cache/
+**/.ipynb_checkpoints/
