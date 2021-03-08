@@ -7,20 +7,19 @@ from config import config
 from flask_login import LoginManager
 
 
-# 初始化
+# Initialize
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 db = SQLAlchemy()
 
-# 登录管理
+# Login manager
 login_manager = LoginManager()
 login_manager.session_protection = "strong"
 login_manager.login_view = "auth.login"
 
 
 def create_app(config_name):
-    """在工厂函数中初始化"""
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
@@ -33,7 +32,8 @@ def create_app(config_name):
     from .main import main as main_blueprint
 
     app.register_blueprint(main_blueprint)
-    # 附加auth蓝本
+
+    # Add auth blueprint
     from .auth import auth as auth_blueprint
 
     app.register_blueprint(auth_blueprint, url_prefix="/auth")

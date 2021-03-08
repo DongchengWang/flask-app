@@ -5,13 +5,11 @@ from . import mail
 
 
 def send_async_email(app, msg):
-    """异步发送邮件"""
     with app.app_context():
         mail.send(msg)
 
 
 def send_email(to, subject, template, **kwargs):
-    """发送邮件给用户"""
     app = current_app._get_current_object()
     msg = Message(
         app.config["FLASKY_MAIL_SUBJECT_PREFIX"] + " " + subject,

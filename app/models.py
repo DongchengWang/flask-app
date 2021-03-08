@@ -1,4 +1,4 @@
-# . 引用app/__init__.py
+# . refers to app/__init__.py
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_required
 
@@ -13,16 +13,13 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-# @app.route('/secret')
+# @app.route("/secret")
 # @login_required
 # def secret():
-#     '''保护路由只让认证用户访问'''
-#     return 'Only authenticated users are allowed!'
+#     return "Only authenticated users are allowed!"
 
 
 class Role(db.Model):
-    """数据库操作"""
-
     __tablename__ = "roles"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
@@ -33,8 +30,6 @@ class Role(db.Model):
 
 
 class User(UserMixin, db.Model):
-    """用户模型"""
-
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), unique=True, index=True)
