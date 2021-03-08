@@ -1,14 +1,25 @@
-# 博客 hub 应用的功能
+# Introduction
 
-* 博客
-* 投票
-* pull request，issue,project
-* watch,star,fork,
-* 文章的版权问题，开源协议
-* 文章来访的管理
+A small flask app
 
-# 需要安装的依赖包
+## How to start
 
+Step 1: install Python 3.9+
+
+Step 2: install poetry for dependency management
+
+```bash
+pip install poetry
 ```
-pip install flask flask-script flask-bootstrap flask-wtf flask-sqlalchemy flask-moment flask-migrate flask-mail flask-login
+
+Step 3: install dependencies
+
+```bash
+poetry install
+```
+
+Finally, enjoy your ride~
+
+```bash
+poetry run python flask-app.py
 ```
